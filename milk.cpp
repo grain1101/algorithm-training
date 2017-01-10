@@ -7,16 +7,16 @@ LANG: C++11
 #include <fstream>
 #include <string>
 #include <vector>
-#include<algorithm>
-#include<set>
-#include<utility>
+#include <algorithm>
+#include <set>
+#include <utility>
 
 using namespace std;
 typedef pair<int, int> PII;
 
-void show(vector<PII> a)
+void show(const vector<PII>& a)
 {
-    for (auto t : a)
+    for (auto &t : a)
     {
         cout << t.first << " " << t.second << endl;
     }
