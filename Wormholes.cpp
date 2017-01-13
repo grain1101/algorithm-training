@@ -22,18 +22,11 @@ int result = 0;
 int n;
 vector<PII> point;
 
-void show(const vector<vector<int>>& t){
-    for(auto& tt : t){
-        for(auto& ttt: tt)
-            cout << ttt << "  ";
-    cout << endl;
-    }
-
-}
-
 bool isLeft(int p1, int p2){
     if(point[p1].second == point[p2].second && point[p1].first < point[p2].first){
         for(auto& p:point){
+            //p.first -> x; p.second ->y
+            // A -> B -> C; so A is not Left of C
             if(p.second == point[p1].second && point[p1].first < p.first && p.first < point[p2].first) return false;
         }
         return true;
@@ -41,60 +34,56 @@ bool isLeft(int p1, int p2){
     return false;
 }
 
-void hasCircle(const vector<vector<int>>& edges, int node, bool& flag, vector<int>& color){
+int in[16];
+int out[16];
+vector<int> portal;
+vector<int> rightp;
+void hasCircle(int node, bool& flag){
     if(flag){
         return;
     }
     // color: 0->white; 1->grey; 2->black;
-    color[node] = 1;
-    for(int i=0;i<edges.size();i++){
-        if(edges[node][i] == 1){
-            if(color[i] == 2) continue;
-            if(color[i] ==1) {
-                flag = true;
-                return;
-            }
-            hasCircle(edges,i,flag,color);
-        }
+    // every point has two part: in and out. If go through portal, out make as grey.
+    in[node] = 1;
+    int next = portal[node];
+    if (out[next] == 2) return;
+    if (out[next] == 1) {
+      flag = true;
+      return;
     }
-
+    out[next] = 1;
+    if (rightp[next] != -1) {
+      int nextnode = rightp[next];
+      if (in[nextnode] == 0) hasCircle(nextnode, flag);
+      else if (in[nextnode] == 1) {
+        flag = true;
+        return;
+      }
+    }
+    out[next] = 2;
+    in[node] = 2;
 }
 
 bool Stucked(const vector<PII>& pairs){
-    //1. y1==y2
-    int num = pairs.size();
-    if(num==0) return false;
-    for(auto p : pairs){
-        if(isLeft(p.first, p.second) || isLeft(p.second, p.first)) return true;
-    }
-    //2. portal -> portal2 p1->p3 || p1->p4 || p2->p3 || p2->p4
-    vector<vector<int>> edges(num, vector<int>(num,0));
-    for(int i=0;i<num;i++){
-        for(int j=0;j<num;j++){
-            int p1 = pairs[i].first;
-            int p2 = pairs[i].second;
-            int p3 = pairs[j].first;
-            int p4 = pairs[j].second;
-            if(isLeft(p1, p3) || isLeft(p1, p4) || isLeft(p2, p3) || isLeft(p2,p4))
-                edges[i][j] = 1;
-        }
-    }
-
-    //3. Is cycle graph
-    vector<int> color(edges.size(),0);
+  portal.assign(n, 0);
+  for(auto& p : pairs) {
+    portal[p.first] = p.second;
+    portal[p.second] = p.first;
+  }
+  for(int i = 0; i < n; i++){
+    fill(in, in+n, 0);
+    fill(out, out+n,0);
     bool flag = false;
-    hasCircle(edges,0,flag,color);
-    return flag;
+    hasCircle(i,flag);
+    if(flag) return true;
+  }
+  return false;
 }
 
 void dfs(vector<PII>& pairs, vector<int>& mark){
     if(pairs.size() == n/2){
         if(Stucked(pairs)){
             result++;
-            for(auto& p:pairs){
-                cout << "("<<p.first<<","<<p.second<<")";
-            }
-            cout << endl;
         }
         return;
     }
@@ -120,9 +109,7 @@ void dfs(vector<PII>& pairs, vector<int>& mark){
     }
 }
 
-
 int main() {
-
     // 0. input lock
     int tmp;
     fin >> n;
@@ -131,13 +118,20 @@ int main() {
         fin >> x >> y;
         point.push_back({x,y});
     }
-
+    rightp.assign(n, -1);
+    for(int i = 0; i < n; i++) {
+      for(int j = 0; j < n; j++) {
+        if (isLeft(i, j)) {
+          rightp[i] = j;
+        }
+      }
+    }
     // 1. all points Pairs
     vector<PII> pairs;
     vector<int> mark(n,0);
 
     dfs(pairs, mark);
-    cout << result << endl;
+    fout << result << endl;
 
     return 0;
 }
