@@ -20,18 +20,17 @@ public:
     // Iterative
     vector<int> postOrderTraversalIterative(TreeNode* root) {
         vector<int> ret;
-        if (!root) return ret;
+        if (root == nullptr) return ret;
         stack<TreeNode*> st;
-        TreeNode *cur, *prev;
+        TreeNode *prev = nullptr;
         st.push(root);
         while(!st.empty()){
-            cur = st.top();
+            TreeNode *cur = st.top();
             if (prev == nullptr || prev->left == cur || prev->right == cur){ // traverse down the tree
-
-                if (!cur->left)         st.push(cur->left);
-                else if (!cur->right)   st.push(cur->right);
+                if (cur->left != nullptr)         st.push(cur->left);
+                else if (cur->right != nullptr)   st.push(cur->right);
             } else if (cur->left == prev) {     // traverse up the tree from the left
-                if (!cur->right) st.push(cur->right);
+                if (cur->right != nullptr) st.push(cur->right);
             } else {            // traverse up the tree from the right
                 ret.push_back(cur->val);
                 st.pop();
@@ -40,6 +39,8 @@ public:
         }
         return ret;
     }
+private:
+    vector<int> ret;
 };
 
 int main() {
