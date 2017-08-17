@@ -41,7 +41,6 @@ public:
         return cnt;
     }
 };
-
 typedef pair<int, int> PII;
 class Solution {
 public:
