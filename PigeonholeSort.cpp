@@ -6,7 +6,7 @@ public:
 		int len = maxV - minV + 1;
 		vector<vector<int>> hole(len);
 		for(auto n : nums) {
-			hole[n - minV].push_back(n);
+			hole[n - minV].push_back(n);	// offset is minV;
 		}
 		int idx = 0;
 		for(int i = 0; i < len; i++) {
